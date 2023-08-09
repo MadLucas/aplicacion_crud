@@ -1,27 +1,32 @@
 // Función para agregar datos
 const addData = () => {
+    //obtener los valores de los inputs llamandolos mediante su ID
     const name = document.getElementById('name').value;
     const address = document.getElementById('address').value;
     const email = document.getElementById('email').value;
 
+    // verificamos que los campos no esten vacios, si alguno de los campos esta vacio
     if (!name || !address || !email) {
         alert('Por favor, rellene todos los campos requeridos');
         return;
     }
 
+
+    //creamos un objeto con los datos
     const data = { name, address, email };
-    const savedData = JSON.parse(localStorage.getItem('savedData'));
-
+    const savedData = JSON.parse(localStorage.getItem('savedData')) || []; // obtener losdatos guardados en el almacenamiento local O crear un nuevo array
+    
+    //agregar los nuevos datos al array
     savedData.push(data);
-    localStorage.setItem('savedData', JSON.stringify(savedData)) || [];
+    localStorage.setItem('savedData', JSON.stringify(savedData));//guardamos los nuevos datos actualizados en el almacenamiento local
 
-    showData();
+    showData();//Mostramos los datos actualizado en Tabla 
 };
 
 
 // Función para borrar datos de la tabla
 const deleteData = (index) => {
-    const savedData = JSON.parse(localStorage.getItem('savedData')) || [];
+    const savedData = JSON.parse(localStorage.getItem('savedData'));//obtener los datos guardados en el almacenamiento local 
 
     if (index >= 0 && index < savedData.length) {
         savedData.splice(index, 1);
@@ -30,9 +35,10 @@ const deleteData = (index) => {
     }
 };
 
-// Función para editar datos en el formulario
+
+// funcion para editar datos 
 const editData = (index) => {
-    const savedData = JSON.parse(localStorage.getItem('savedData')) || [];
+    const savedData = JSON.parse(localStorage.getItem('savedData'));
 
     if (index >= 0 && index < savedData.length) {
         const data = savedData[index];
@@ -43,13 +49,21 @@ const editData = (index) => {
         // Cambiar el botón de agregar por el botón de actualizar
         document.getElementById('addData').style.display = 'none';
         document.getElementById('updateData').style.display = 'inline';
+        
+        // Almacenar el índice actual en un atributo de datos para usarlo en updateData()
+        document.getElementById('updateData').setAttribute('data-index', index);
+        
         // Asignar la función de actualización al botón de actualizar
-        document.getElementById('updateData').onclick = () => updateData(index);
+        document.getElementById('updateData').onclick = updateData;
     }
 };
 
+
 // Función para actualizar datos en el formulario
-const updateData = (index) => {
+const updateData = () => {
+    // Obtener el índice del atributo de datos almacenado en el botón de actualizar
+    const index = parseInt(document.getElementById('updateData').getAttribute('data-index'));
+
     const name = document.getElementById('name').value;
     const address = document.getElementById('address').value;
     const email = document.getElementById('email').value;
@@ -60,7 +74,7 @@ const updateData = (index) => {
     }
 
     const data = { name, address, email };
-    const savedData = JSON.parse(localStorage.getItem('savedData'));
+    const savedData = JSON.parse(localStorage.getItem('savedData')) || [];
 
     if (index >= 0 && index < savedData.length) {
         savedData[index] = data;
@@ -70,12 +84,15 @@ const updateData = (index) => {
         // Restaurar el botón de agregar y ocultar el botón de actualizar
         document.getElementById('addData').style.display = 'inline';
         document.getElementById('updateData').style.display = 'none';
+        
         // Limpiar los campos del formulario
         document.getElementById('name').value = '';
         document.getElementById('address').value = '';
         document.getElementById('email').value = '';
     }
 };
+
+// ...
 
 // Función para mostrar los datos en la tabla
 const showData = () => {
