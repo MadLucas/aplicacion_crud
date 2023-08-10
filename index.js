@@ -1,84 +1,79 @@
+
+
+let register = []
+
 // Función para agregar datos
 const addData = () => {
-    const { name, address, email } = getInputValues();
+    const { name, address, email } = getInputValues();//obtenemos valor del formulario con la funcion getInputValues
 
-    if (!name || !address || !email) {
+    if (!name || !address || !email) {//verificamos si los campos requeridos estan vacios
         alert('Por favor, rellene todos los campos requeridos');
         return;
     }
 
-    const data = { name, address, email, id: Date.now() };
-    const savedData = getSavedData();
+    const data = { name, address, email, id: Date.now() }; // creamos un oobjeto 'data' con valores obtenidos generando una ID basada en la hora ACTUAL
 
-    savedData.push(data);
-    saveData(savedData);
+    register.push(data);// agregamos el nuevo objeto 'data' al arreglo 'savedData'
+    saveData();
 
-    updateForm();
-    showData();
+    updateForm();//actualiza el formulario
+    showData();// y muestra los datos en la tabla 
 };
 
 // Función para borrar datos de la tabla
-const deleteData = (id) => {
-    const savedData = getSavedData();
-    const newData = savedData.filter(data => data.id !== id);
+    const deleteData = (id) => {
+        const index = register.findIndex((el) => el.id == id);
+        register.splice(index, 1)
 
-    saveData(newData);
+
+    saveData();
     showData();
 };
 
 // Función para editar datos
 const editData = (id) => {
-    const savedData = getSavedData();
-    const dataToEdit = savedData.find(data => data.id === id);
-
-    if (dataToEdit) {
-        setInputValues(dataToEdit);
-
-        document.getElementById('addData').style.display = 'none';
-        document.getElementById('updateData').style.display = 'inline';
-        idEdit = id;
-
-        document.getElementById('updateData').onclick = updateData;
-    }
+    document.getElementById('addData').style.display = 'none';// oculta el boton agregar
+    document.getElementById('updateData').style.display = 'inline';// mostramos el boton actualizar
+    idEdit = id;//almacena la id del objeto editado en idEdit
+    
+    const index = register.findIndex((el) => el.id == id);
+    const data = register[index];
+    setInputValues(data)
 };
 
+
+
 // Función para actualizar datos en el formulario
-const updateData = () => {
-    const { name, address, email } = getInputValues();
+const updateData = (event) => {
 
-    if (!name || !address || !email) {
-        alert('Por favor, rellene todos los campos requeridos');
-        return;
-    }
+    event.preventDefault()
 
-    const savedData = getSavedData();
-    const dataToUpdateIndex = savedData.findIndex(data => data.id === idEdit);
+    const data = getInputValues();
+    const index = register.findIndex((el) => el.id == idEdit);
+    console.log(index)
+    register[index] = data;
+    console.log(register)
+    
+    saveData()
+    showData()
 
-    if (dataToUpdateIndex !== -1) {
-        savedData[dataToUpdateIndex] = { ...savedData[dataToUpdateIndex], name, address, email };
-        saveData(savedData);
+    idEdit = null;
+    updateForm()
 
-        updateForm();
-        showData();
-
-        idEdit = null;
-    }
 };
 
 // Función para mostrar los datos en la tabla
 const showData = () => {
-    const savedData = getSavedData();
+    getSavedData();
     const tableBody = document.getElementById('tableBody');
     tableBody.innerHTML = '';
 
-    savedData.forEach(element => {
+    register.forEach(element => {
         tableBody.innerHTML += `
         <tr>
             <td>${element.name}</td>
             <td>${element.address}</td>
             <td>${element.email}</td>
-            <td>${element.id}</td>
-            <td>
                 <button class="btn btn-warning" onclick="editData(${element.id})">Editar</button>
                 <button class="btn btn-danger" onclick="deleteData(${element.id})">Borrar</button>
             </td>
@@ -91,6 +86,9 @@ showData();
 
 // Escuchar el evento de clic en el botón "addData" y llamar a la función addData()
 document.getElementById('addData').addEventListener('click', addData);
+
+//Escuchar el evento del clic en el boton "updateData" y llamar a la funcion updateData
+document.getElementById('updateData').addEventListener('click', updateData)
 
 let idEdit = null;
 
@@ -109,11 +107,11 @@ function setInputValues(data) {
 }
 
 function getSavedData() {
-    return JSON.parse(localStorage.getItem('savedData')) || [];
+    register = JSON.parse(localStorage.getItem('savedData')) || [];
 }
 
-function saveData(data) {
-    localStorage.setItem('savedData', JSON.stringify(data));
+function saveData() {
+    localStorage.setItem('savedData', JSON.stringify(register));
 }
 
 function updateForm() {
