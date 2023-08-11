@@ -58,7 +58,7 @@ const showData = () => {
 const addData = () => {
     const { name, address, email } = getInputValues();//obtenemos valor del formulario con la funcion getInputValues
 
-    if (!name || !address || !email) {//verificamos si los campos requeridos estan vacios
+    if (!name || !address || !email.includes("@")) {//verificamos si los campos requeridos estan vacios
         alert('Por favor, rellene todos los campos requeridos');// si estan vacios le informamos al usuario con una alerta 
         return;
     }
